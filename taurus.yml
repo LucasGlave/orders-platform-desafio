@@ -1,0 +1,82 @@
+execution:
+  - concurrency: 10
+    hold-for: 2m
+    ramp-up: 1m
+    scenario: simple
+  - concurrency: 20
+    hold-for: 2m
+    ramp-up: 1m
+    scenario: simple
+  - concurrency: 40
+    hold-for: 2m
+    ramp-up: 1m
+    scenario: simple
+  - concurrency: 80
+    hold-for: 2m
+    ramp-up: 1m
+    scenario: simple
+  - concurrency: 100
+    hold-for: 2m
+    ramp-up: 1m
+    scenario: simple
+
+scenarios:
+  simple:
+    default-address: https://orders-backend-mrjgh.ondigitalocean.app
+    requests:
+      - url: /api/clients/1/orders
+        method: GET
+        label: "Get Client Orders"      
+      - url: /api/clients
+        method: GET
+        label: "Get All Clients"
+      - url: /api/clients
+        method: POST
+        body: '{"nombre": "Test Client", "direccion": "Test Address"}'
+        headers:
+          Content-Type: application/json
+        label: "Create Client"            
+      - url: /api/commerces/1/orders
+        method: GET
+        label: "Get Commerce Orders"     
+      - url: /api/commerces
+        method: GET
+        label: "Get All Commerces"
+      - url: /api/commerces
+        method: POST
+        body: '{"nombre": "Test Commerce", "activo": true, "max_pedidos": 50}'
+        headers:
+          Content-Type: application/json
+        label: "Create Commerce"     
+      - url: /api/deliveryMen/1/orders
+        method: GET
+        label: "Get DeliveryMan Orders"      
+      - url: /api/deliveryMen
+        method: GET
+        label: "Get All DeliveryMen"
+      - url: /api/orders/state/preparado
+        method: GET
+        label: "Get Orders by State - Preparado"
+      - url: /api/orders/state/en_curso
+        method: GET
+        label: "Get Orders by State - En Curso"
+      - url: /api/orders/state/entregado
+        method: GET
+        label: "Get Orders by State - Entregado"
+      - url: /api/orders/state/cancelado
+        method: GET
+        label: "Get Orders by State - Cancelado"
+      - url: /api/orders
+        method: GET
+        label: "Get All Orders"
+
+reporting:
+  - module: final-stats
+  - module: junit-xml
+    filename: reports/report.xml
+  - module: passfail
+    criteria:
+      - avg-rt>1s for 1m, continue as failed
+      - failures>10%, continue as failed
+  - module: console
+    disable: false
